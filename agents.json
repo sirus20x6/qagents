@@ -1,22 +1,26 @@
 {
-    "model": "llama_model.bin",
+    "model": "/home/sirus/Downloads/Qwen2.5-Coder-7B-Instruct-Q4_K_L.gguf",
     "batch_size": 4,
     "agents": [
       {
         "name": "ConstCorrectnessAgent",
-        "system_prompt": "Analyze the following C++ code for const correctness. Identify functions, parameters, or variables that could benefit from const."
+        "role_system": "You are an advanced programmer specializing in quality control",
+        "role_user": "Analyze the following C++ code for const correctness. Identify functions, parameters, or variables that could benefit from const."
       },
       {
         "name": "StyleGuideAgent",
-        "system_prompt": "Analyze the following C++ code for adherence to standard style guides (e.g., naming conventions, spacing, and formatting)."
+        "role_system": "You are an advanced programmer specializing in quality control",
+        "role_user": "Analyze the following C++ code for adherence to standard style guides (e.g., naming conventions, spacing, and formatting)."
       },
       {
         "name": "NamingConventionsAgent",
-        "system_prompt": "Analyze the following C++ code for adherence to consistent and meaningful naming conventions."
+        "role_system": "You are an advanced programmer specializing in quality control",
+        "role_user": "Analyze the following C++ code for adherence to consistent and meaningful naming conventions."
       },
       {
         "name": "UnusedDeclarationsAgent",
-        "system_prompt": "Analyze the following C++ code for unused variables, functions, or declarations."
+        "role_system": "You are an advanced programmer specializing in quality control",
+        "role_user": "Analyze the following C++ code for unused variables, functions, or declarations."
       }
     ]
   }

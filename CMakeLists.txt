@@ -8,8 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Output directory
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-# FetchContent for nlohmann/json
+# FetchContent for dependencies
 include(FetchContent)
+
+# Fetch nlohmann/json
 FetchContent_Declare(
     json
     GIT_REPOSITORY https://github.com/nlohmann/json.git
@@ -17,34 +19,21 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-# Fetch llama.cpp
+# Fetch CPR for HTTP requests
 FetchContent_Declare(
-    llama
-    GIT_REPOSITORY https://github.com/ggerganov/llama.cpp.git
-    GIT_TAG master
+    cpr
+    GIT_REPOSITORY https://github.com/libcpr/cpr.git
+    GIT_TAG 1.10.5
 )
-FetchContent_MakeAvailable(llama)
-
-# Find OpenBLAS
-find_package(OpenBLAS REQUIRED)
+FetchContent_MakeAvailable(cpr)
 
 # Add the executable
 add_executable(DynamicAgents 
     main.cpp
-    llama_context.cpp
-)
-
-# Include directories
-target_include_directories(DynamicAgents PRIVATE 
-    ${CMAKE_SOURCE_DIR}
-    ${llama_SOURCE_DIR}/include
-    ${llama_SOURCE_DIR}/ggml/include
-    ${CMAKE_BINARY_DIR}/_deps/llama-src/include
 )
 
 # Link libraries
 target_link_libraries(DynamicAgents PRIVATE 
     nlohmann_json::nlohmann_json
-    llama
-    OpenBLAS::OpenBLAS
+    cpr::cpr
 )

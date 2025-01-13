@@ -1,11 +1,11 @@
-#include "llama_context.hpp"
+#include "api_client.hpp"
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <limits.h>
 
 using json = nlohmann::json;
 
-// Load JSON configuration file
 json loadConfig(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {
@@ -14,7 +14,6 @@ json loadConfig(const std::string& path) {
     return json::parse(file);
 }
 
-// Read entire file content
 std::string readFile(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {
@@ -24,11 +23,10 @@ std::string readFile(const std::string& path) {
                       std::istreambuf_iterator<char>());
 }
 
-// Write analysis results to file
-void writeReport(const std::string& modelName, const std::string& fileName, 
+void writeReport(const std::string& fileName, 
                 const std::vector<std::string>& agentNames,
                 const std::vector<std::string>& responses) {
-    std::string reportName = modelName + "_report.txt";
+    std::string reportName = "analysis_report.txt";
     std::ofstream report(reportName, std::ios::app);
     if (!report.is_open()) {
         throw std::runtime_error("Could not open report file: " + reportName);
@@ -50,30 +48,32 @@ int main(int argc, char* argv[]) {
         }
 
         std::string filePath = argv[1];
-
+        
         // Load agent configuration
         json config = loadConfig("agents.json");
         
-        // Setup model configuration
-        ModelConfig modelConfig;
-        modelConfig.modelPath = config["model"].get<std::string>();
-        modelConfig.contextLength = 4096;  // Adjust based on your needs
-        modelConfig.threads = 4;
-        modelConfig.batchSize = config["batch_size"].get<int>();
+        // Get model and batching configuration
+        std::string model = config["model"].get<std::string>();
+        if (model[0] != '/') {
+            char absPath[PATH_MAX];
+            if (realpath(model.c_str(), absPath) != nullptr) {
+                model = std::string(absPath);
+            } else {
+                throw std::runtime_error("Could not resolve absolute path for model: " + model);
+            }
+        }
         
-        // Initialize LLaMA context
-        LLaMAContext llama(modelConfig);
+        int batchSize = config["batch_size"].get<int>();
         
-        // Extract agent information
-        std::vector<std::string> agentNames;
-        std::vector<std::string> agentPrompts;
-        for (const auto& agent : config["agents"]) {
-            agentNames.push_back(agent["name"].get<std::string>());
-            agentPrompts.push_back(agent["system_prompt"].get<std::string>());
+        // Initialize API client and test connection
+        LlamaApiClient client("http://localhost:8080");
+        try {
+            client.testConnection();
+        } catch (const std::exception& e) {
+            std::cerr << "Server Connection Error: " << e.what() << "\n";
+            return 1;
         }
 
-        std::cout << "Analyzing " << filePath << "...\n";
-        
         // Read the code file
         std::string code;
         try {
@@ -83,17 +83,51 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        // Prepare prompts for each agent
-        std::vector<std::string> prompts;
-        for (const auto& prompt : agentPrompts) {
-            prompts.push_back(prompt + "\n\nCode to analyze:\n" + code);
+        // Process in batches
+        std::vector<std::string> responses;
+        std::vector<std::string> agentNames;
+
+        // Collect all agents first
+        std::vector<LlamaApiClient::Request> allRequests;
+        for (const auto& agent : config["agents"]) {
+            std::string name = agent["name"].get<std::string>();
+            std::string system_role = agent["role_system"].get<std::string>();
+            std::string user_role = agent["role_user"].get<std::string>();
+            
+            agentNames.push_back(name);
+            allRequests.push_back({
+                name,
+                system_role,
+                user_role + "\n\nCode to analyze:\n" + code
+            });
         }
 
-        // Process in batches based on config
-        std::vector<std::string> responses = llama.processBatch(prompts, 1024); // Adjust max tokens as needed
+        // Process in batches
+        for (size_t i = 0; i < allRequests.size(); i += batchSize) {
+            std::cout << "Processing batch starting with " << allRequests[i].name << "...\n";
+            
+            // Prepare batch
+            std::vector<LlamaApiClient::Request> batchRequests;
+            for (size_t j = 0; j < batchSize && i + j < allRequests.size(); ++j) {
+                batchRequests.push_back(allRequests[i + j]);
+            }
+
+            try {
+                auto batchResponses = client.createBatchCompletions(batchRequests, model, 1024);
+                for (const auto& response : batchResponses) {
+                    responses.push_back(response["choices"][0]["message"]["content"].get<std::string>());
+                }
+                std::cout << "Completed batch.\n";
+            } catch (const std::exception& e) {
+                std::cerr << "Error processing batch: " << e.what() << "\n";
+                for (size_t j = 0; j < batchRequests.size(); ++j) {
+                    responses.push_back("Error: Analysis failed");
+                }
+            }
+        }
 
         // Write analysis results
-        writeReport(modelConfig.modelPath, filePath, agentNames, responses);
+        writeReport(filePath, agentNames, responses);
         
         std::cout << "Analysis complete for " << filePath << "\n";
         return 0;
