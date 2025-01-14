@@ -38,11 +38,19 @@ std::string getCurrentDateTime() {
     return oss.str();
 }
 
+// Helper function to get base filename from path
+std::string getBaseName(const std::string& path) {
+    size_t pos = path.find_last_of("/\\");
+    return pos == std::string::npos ? path : path.substr(pos + 1);
+}
+
 void writeReport(const std::string& fileName, 
                  const std::vector<std::string>& agentNames,
                  const std::vector<std::string>& responses) 
 {
-    std::string reportName = "analysis_report.txt";
+    // Create report name based on input filename
+    std::string baseName = getBaseName(fileName);
+    std::string reportName = "analysis_" + baseName + ".txt";
     std::ofstream report(reportName, std::ios::app);
     if (!report.is_open()) {
         throw std::runtime_error("Could not open report file: " + reportName);
@@ -114,12 +122,6 @@ int main(int argc, char* argv[]) {
 
         // Initialize API client and test connection
         LlamaApiClient client("http://localhost:8080");
-        try {
-            client.testConnection();
-        } catch (const std::exception& e) {
-            std::cerr << "Server Connection Error: " << e.what() << "\n";
-            return 1;
-        }
 
         // Read the code file
         std::string code;

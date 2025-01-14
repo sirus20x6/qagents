@@ -12,11 +12,17 @@ public:
         std::string prompt;       // The actual text to analyze
     };
 
-    LlamaApiClient(const std::string& url = "http://localhost:8080", int32_t timeout = 30)
-        : baseUrl(url), timeoutSeconds(timeout) {}
+    struct ConnectionConfig {
+        int maxRetries;        // Maximum number of connection retry attempts
+        int retryDelayMs;      // Delay between retries in milliseconds
 
-    // Throw if server is unreachable
-    void testConnection();
+        ConnectionConfig() : maxRetries(3), retryDelayMs(10000) {}  // Constructor with default values
+    };
+
+    LlamaApiClient(const std::string& url = "http://localhost:8080", 
+                  int32_t timeout = 30,
+                  const ConnectionConfig& config = ConnectionConfig())
+        : baseUrl(url), timeoutSeconds(timeout), connectionConfig(config) {}
 
     // Now we only need a single-call method for each agent
     nlohmann::json createSingleCompletion(
@@ -28,7 +34,6 @@ public:
 private:
     std::string baseUrl;
     int32_t timeoutSeconds;
+    ConnectionConfig connectionConfig;
 
-    // Helper to check server connectivity
-    bool checkServerConnection();
 };

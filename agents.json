@@ -1,207 +1,211 @@
 {
-    "model": "/thearray/git/ob/text-generation-webui/models/qwen2.5-coder-3b-instruct-q4_0.gguf",
-    "batch_size": 40,
-      "agents": [
-        {
-          "name": "ConstCorrectnessAgent",
-          "role_system": "You are an advanced programmer specializing in quality control",
-          "role_user": "Analyze the following C++ code for const correctness. Identify functions, parameters, or variables that could be declared as const, and explain how const correctness can help prevent unintended modifications and improve maintainability."
-        },
-        {
-          "name": "StyleGuideAgent",
-          "role_system": "You are an advanced programmer specializing in quality control",
-          "role_user": "Analyze the following C++ code for adherence to standard style guides (e.g., naming conventions, spacing, and formatting). Provide specific recommendations to align with widely-accepted or project-specific guidelines."
-        },
-        {
-          "name": "NamingConventionsAgent",
-          "role_system": "You are an advanced programmer specializing in quality control",
-          "role_user": "Analyze the following C++ code for adherence to consistent and meaningful naming conventions. Suggest improvements to enhance readability and maintainability."
-        },
-        {
-          "name": "UnusedDeclarationsAgent",
-          "role_system": "You are an advanced programmer specializing in quality control",
-          "role_user": "Analyze the following C++ code for unused variables, functions, or declarations. Recommend their removal or indicate where they may be needed."
-        },
-        {
-          "name": "ModernCppFeaturesAgent",
-          "role_system": "You are an advanced programmer specializing in modern C++",
-          "role_user": "Analyze where modern C++ features (C++11 and later) could be better utilized—e.g., smart pointers, move semantics, auto, range-based for loops, and more. Provide specific code examples or transformations where relevant."
-        },
-        {
-          "name": "ExceptionSafetyAgent",
-          "role_system": "You are an advanced programmer specializing in C++ exception handling",
-          "role_user": "Analyze the code for exception safety. Check for proper exception handling, potential resource leaks, and RAII usage. Offer advice on improving exception-safety guarantees (no-throw, strong, or basic)."
-        },
-        {
-          "name": "ThreadSafetyAgent",
-          "role_system": "You are an advanced programmer specializing in concurrent programming",
-          "role_user": "Analyze the code for thread safety issues, potential race conditions, and proper synchronization. Suggest best practices for multi-threaded design and concurrency primitives."
-        },
-        {
-          "name": "MemoryManagementAgent",
-          "role_system": "You are an advanced programmer specializing in C++ memory management",
-          "role_user": "Analyze memory management practices, identify potential memory leaks, and suggest improvements using RAII, smart pointers, or other modern techniques."
-        },
-        {
-          "name": "PerformanceOptimizationAgent",
-          "role_system": "You are an advanced programmer specializing in C++ performance optimization",
-          "role_user": "Identify potential performance bottlenecks and suggest optimizations (e.g., unnecessary copying, inefficient algorithms, suboptimal data structures). Provide rationale for each optimization."
-        },
-        {
-          "name": "STLUsageAgent",
-          "role_system": "You are an advanced programmer specializing in the C++ Standard Template Library",
-          "role_user": "Analyze usage of STL containers and algorithms. Suggest where STL features could be better utilized (e.g., algorithms over raw loops, appropriate containers for the task, etc.)."
-        },
-        {
-          "name": "SecurityVulnerabilitiesAgent",
-          "role_system": "You are an advanced programmer specializing in C++ security",
-          "role_user": "Analyze the code for potential security vulnerabilities such as buffer overflows, use-after-free, or unvalidated input. Provide steps to mitigate these risks."
-        },
-        {
-          "name": "DocumentationAgent",
-          "role_system": "You are an advanced programmer specializing in code documentation",
-          "role_user": "Analyze the quality and completeness of code documentation. Recommend improvements for comments, function documentation, API references, and overall readability."
-        },
-        {
-          "name": "APIDesignAgent",
-          "role_system": "You are an advanced programmer specializing in API design",
-          "role_user": "Analyze the API design for usability, consistency, and proper encapsulation. Consider interface design principles and provide recommendations for a more intuitive API."
-        },
-        {
-          "name": "ErrorHandlingAgent",
-          "role_system": "You are an advanced programmer specializing in error handling",
-          "role_user": "Analyze error handling strategies, including error reporting, error propagation, and recovery mechanisms. Suggest ways to make error handling more robust and consistent."
-        },
-        {
-          "name": "TestabilityAgent",
-          "role_system": "You are an advanced programmer specializing in software testing",
-          "role_user": "Analyze code testability. Identify areas that might be difficult to test and suggest improvements or design changes for better test coverage and simpler testing."
-        },
-        {
-          "name": "DependencyManagementAgent",
-          "role_system": "You are an advanced programmer specializing in software architecture",
-          "role_user": "Analyze dependency management and coupling between components. Identify potential dependency issues or circular dependencies. Suggest design approaches to reduce coupling."
-        },
-        {
-          "name": "ForwardCompatibilityAgent",
-          "role_system": "You are an advanced programmer specializing in software evolution",
-          "role_user": "Analyze the code for forward compatibility issues. Identify potential problems that could impede future maintenance or extension. Propose strategies for sustainable growth."
-        },
-        {
-          "name": "CompilerWarningsAgent",
-          "role_system": "You are an advanced programmer specializing in C++ compilation",
-          "role_user": "Identify code that might trigger compiler warnings or implementation-defined behavior. Advise on compiler settings and code changes to reduce or eliminate warnings."
-        },
-        {
-          "name": "ResourceManagementAgent",
-          "role_system": "You are an advanced programmer specializing in resource management",
-          "role_user": "Analyze resource management (files, network connections, etc.) for proper acquisition and release. Suggest ways to prevent resource leaks and ensure graceful resource cleanup."
-        },
-        {
-          "name": "CodeComplexityAgent",
-          "role_system": "You are an advanced programmer specializing in code quality metrics",
-          "role_user": "Analyze code complexity. Identify overly complex functions or classes that might benefit from refactoring. Provide specific refactoring suggestions."
-        },
-        {
-          "name": "InlineFunctionsAgent",
-          "role_system": "You are an advanced programmer specializing in inline function usage",
-          "role_user": "Analyze the C++ code for potential use or misuse of inline functions. Consider where inlining might improve performance or clarity, and where it may be detrimental due to code bloat."
-        },
-        {
-          "name": "TemplateMetaprogrammingAgent",
-          "role_system": "You are an advanced programmer specializing in advanced template metaprogramming techniques",
-          "role_user": "Analyze the code for opportunities to use template metaprogramming. Look for repetitive patterns, compile-time computations, or generic code that could be optimized with templates."
-        },
-        {
-          "name": "DesignPatternsAgent",
-          "role_system": "You are an advanced programmer specializing in C++ software design patterns",
-          "role_user": "Analyze the code to see if common design patterns (e.g., Singleton, Factory, Observer) are applicable or misapplied. Suggest improvements or refactoring to better follow established patterns."
-        },
-        {
-          "name": "CodeRefactoringAgent",
-          "role_system": "You are an advanced programmer specializing in refactoring C++ codebases",
-          "role_user": "Inspect the code for areas that would benefit from refactoring. Identify duplicate logic, long functions, or classes that could be broken down and reorganized. Provide actionable refactoring ideas."
-        },
-        {
-          "name": "TypeSafetyAgent",
-          "role_system": "You are an advanced programmer specializing in type safety and type-related issues",
-          "role_user": "Analyze the code for potential type safety violations. Identify implicit conversions, C-style casts, and uninitialized variables that may lead to undefined behavior. Suggest safer alternatives."
-        },
-        {
-          "name": "CrossPlatformAgent",
-          "role_system": "You are an advanced programmer specializing in cross-platform C++ development",
-          "role_user": "Analyze the code for cross-platform portability issues. Check for non-portable libraries, OS-specific assumptions, or compiler extensions that could hinder portability. Suggest portable solutions."
-        },
-        {
-          "name": "BuildSystemAgent",
-          "role_system": "You are an advanced programmer specializing in C++ build systems",
-          "role_user": "Analyze the build system configuration (e.g., CMake, Makefiles) for potential improvements, such as optimization flags, target-specific settings, or modularization. Provide tips for more efficient builds."
-        },
-        {
-          "name": "TemplateParameterConstraintsAgent",
-          "role_system": "You are an advanced programmer specializing in constraints and concepts in modern C++",
-          "role_user": "Analyze the usage of templates and template parameters. Suggest improvements using concepts (C++20) or SFINAE to enforce stronger constraints and produce clearer error messages."
-        },
-        {
-          "name": "PolymorphismAgent",
-          "role_system": "You are an advanced programmer specializing in object-oriented programming with C++",
-          "role_user": "Analyze the code for polymorphic usage. Identify potential virtual function misuse, missing overrides, or questionable inheritance hierarchies. Suggest design adjustments for safer and more flexible polymorphism."
-        },
-        {
-          "name": "AllocatorUsageAgent",
-          "role_system": "You are an advanced programmer specializing in custom allocators and memory allocation strategies",
-          "role_user": "Inspect the code’s usage of memory allocators. Suggest where custom allocators or memory pools might help performance or memory constraints. Verify correct usage of standard allocators."
-        },
-        {
-          "name": "BitwiseOperationsAgent",
-          "role_system": "You are an advanced programmer specializing in low-level bitwise manipulation and optimization",
-          "role_user": "Analyze the code for bitwise operations. Check for potential optimization, correctness in masks/shifts, and safe usage of bitfields. Provide best practices for maintainable bitwise manipulation."
-        },
-        {
-          "name": "ConcurrencyPrimitivesAgent",
-          "role_system": "You are an advanced programmer specializing in concurrency primitives and multithreading in C++",
-          "role_user": "Inspect the usage of concurrency primitives (mutexes, locks, atomics, condition variables). Identify misuse or overuse and suggest more efficient or safer alternatives for concurrent code."
-        },
-        {
-          "name": "PimplIdiomAgent",
-          "role_system": "You are an advanced programmer specializing in the Pimpl idiom",
-          "role_user": "Analyze the code for potential usage or misuse of the Pimpl idiom. Suggest where the Pimpl idiom might improve compile times, reduce header dependencies, or hide implementation details."
-        },
-        {
-          "name": "LambdaUsageAgent",
-          "role_system": "You are an advanced programmer specializing in C++ lambda expressions",
-          "role_user": "Analyze the code for lambda expressions. Identify places where lambdas could simplify code, or where capturing strategies (by value vs. reference) could be optimized."
-        },
-        {
-          "name": "ModuleDesignAgent",
-          "role_system": "You are an advanced programmer specializing in C++20 modules",
-          "role_user": "Analyze the code for potential migration to C++20 modules. Suggest where modules might reduce compile times, improve encapsulation, and simplify dependencies."
-        },
-        {
-          "name": "CompileTimeOptimizationAgent",
-          "role_system": "You are an advanced programmer specializing in compile-time computations",
-          "role_user": "Inspect the code for expressions or computations that can be moved to compile time (constexpr). Identify runtime computations that could be converted to constexpr functions or variables."
-        },
-        {
-          "name": "ABICompatibilityAgent",
-          "role_system": "You are an advanced programmer specializing in ABI (Application Binary Interface) stability",
-          "role_user": "Analyze the code for potential ABI-breaking changes (e.g., class layout changes, symbol visibility). Suggest best practices to maintain ABI stability across different versions of the library."
-        },
-        {
-          "name": "SanitizersAgent",
-          "role_system": "You are an advanced programmer specializing in C++ sanitizers",
-          "role_user": "Recommend appropriate compiler sanitizers (AddressSanitizer, UndefinedBehaviorSanitizer, etc.) based on the code’s complexity. Highlight how to integrate them into the build for safer debugging."
-        },
-        {
-          "name": "LinkTimeOptimizationAgent",
-          "role_system": "You are an advanced programmer specializing in link-time optimizations (LTO)",
-          "role_user": "Analyze the build process for link-time optimization opportunities. Suggest ways to enable LTO, potential pitfalls, and performance gains."
-        },
-        {
-          "name": "CoroutinesAgent",
-          "role_system": "You are an advanced programmer specializing in C++20 coroutines",
-          "role_user": "Analyze the code for potential use of coroutines. Suggest areas (e.g., asynchronous I/O) where coroutines could simplify code or improve performance compared to traditional concurrency approaches."
-        }
-      ]
-  }
-  
+  "model": "/thearray/git/ob/text-generation-webui/models/qwen2.5-coder-7b-instruct-q8_0.gguf",
+  "batch_size": 5,
+    "agents": [
+      {
+        "name": "ConstCorrectnessAgent",
+        "role_system": "You are an advanced programmer specializing in quality control",
+        "role_user": "Analyze the following C++ code for const correctness. Identify functions, parameters, or variables that could be declared as const, and explain how const correctness can help prevent unintended modifications and improve maintainability."
+      },
+      {
+        "name": "StyleGuideAgent",
+        "role_system": "You are an advanced programmer specializing in quality control",
+        "role_user": "Analyze the following C++ code for adherence to standard style guides (e.g., naming conventions, spacing, and formatting). Provide specific recommendations to align with widely-accepted or project-specific guidelines."
+      },
+      {
+        "name": "NamingConventionsAgent",
+        "role_system": "You are an advanced programmer specializing in quality control",
+        "role_user": "Analyze the following C++ code for adherence to consistent and meaningful naming conventions. Suggest improvements to enhance readability and maintainability."
+      },
+      {
+        "name": "UnusedDeclarationsAgent",
+        "role_system": "You are an advanced programmer specializing in quality control",
+        "role_user": "Analyze the following C++ code for unused variables, functions, or declarations. Recommend their removal or indicate where they may be needed."
+      },
+      {
+        "name": "ModernCppFeaturesAgent",
+        "role_system": "You are an advanced programmer specializing in modern C++",
+        "role_user": "Analyze where modern C++ features (C++11 and later) could be better utilized—e.g., smart pointers, move semantics, auto, range-based for loops, and more. Provide specific code examples or transformations where relevant."
+      },
+      {
+        "name": "ExceptionSafetyAgent",
+        "role_system": "You are an advanced programmer specializing in C++ exception handling",
+        "role_user": "Analyze the code for exception safety. Check for proper exception handling, potential resource leaks, and RAII usage. Offer advice on improving exception-safety guarantees (no-throw, strong, or basic)."
+      },
+      {
+        "name": "ThreadSafetyAgent",
+        "role_system": "You are an advanced programmer specializing in concurrent programming",
+        "role_user": "Analyze the code for thread safety issues, potential race conditions, and proper synchronization. Suggest best practices for multi-threaded design and concurrency primitives."
+      },
+      {
+        "name": "MemoryManagementAgent",
+        "role_system": "You are an advanced programmer specializing in C++ memory management",
+        "role_user": "Analyze memory management practices, identify potential memory leaks, and suggest improvements using RAII, smart pointers, or other modern techniques."
+      },
+      {
+        "name": "PerformanceOptimizationAgent",
+        "role_system": "You are an advanced programmer specializing in C++ performance optimization",
+        "role_user": "Identify potential performance bottlenecks and suggest optimizations (e.g., unnecessary copying, inefficient algorithms, suboptimal data structures). Provide rationale for each optimization."
+      },
+      {
+        "name": "SecurityVulnerabilitiesAgent",
+        "role_system": "You are an advanced programmer specializing in C++ security",
+        "role_user": "Analyze the code for potential security vulnerabilities such as buffer overflows, use-after-free, or unvalidated input. Provide steps to mitigate these risks."
+      },
+      {
+        "name": "APIDesignAgent",
+        "role_system": "You are an advanced programmer specializing in API design",
+        "role_user": "Analyze the API design for usability, consistency, and proper encapsulation. Consider interface design principles and provide recommendations for a more intuitive API."
+      },
+      {
+        "name": "ErrorHandlingAgent",
+        "role_system": "You are an advanced programmer specializing in error handling",
+        "role_user": "Analyze error handling strategies, including error reporting, error propagation, and recovery mechanisms. Suggest ways to make error handling more robust and consistent."
+      },
+      {
+        "name": "TestabilityAgent",
+        "role_system": "You are an advanced programmer specializing in software testing",
+        "role_user": "Analyze code testability. Identify areas that might be difficult to test and suggest improvements or design changes for better test coverage and simpler testing."
+      },
+      {
+        "name": "DependencyManagementAgent",
+        "role_system": "You are an advanced programmer specializing in software architecture",
+        "role_user": "Analyze dependency management and coupling between components. Identify potential dependency issues or circular dependencies. Suggest design approaches to reduce coupling."
+      },
+      {
+        "name": "ForwardCompatibilityAgent",
+        "role_system": "You are an advanced programmer specializing in software evolution",
+        "role_user": "Analyze the code for forward compatibility issues. Identify potential problems that could impede future maintenance or extension. Propose strategies for sustainable growth."
+      },
+      {
+        "name": "CompilerWarningsAgent",
+        "role_system": "You are an advanced programmer specializing in C++ compilation",
+        "role_user": "Identify code that might trigger compiler warnings or implementation-defined behavior. Advise on compiler settings and code changes to reduce or eliminate warnings."
+      },
+      {
+        "name": "ResourceManagementAgent",
+        "role_system": "You are an advanced programmer specializing in resource management",
+        "role_user": "Analyze resource management (files, network connections, etc.) for proper acquisition and release. Suggest ways to prevent resource leaks and ensure graceful resource cleanup."
+      },
+      {
+        "name": "InlineFunctionsAgent",
+        "role_system": "You are an advanced programmer specializing in inline function usage",
+        "role_user": "Analyze the C++ code for potential use or misuse of inline functions. Consider where inlining might improve performance or clarity, and where it may be detrimental due to code bloat."
+      },
+      {
+        "name": "TemplateMetaprogrammingAgent",
+        "role_system": "You are an advanced programmer specializing in advanced template metaprogramming techniques",
+        "role_user": "Analyze the code for opportunities to use template metaprogramming. Look for repetitive patterns, compile-time computations, or generic code that could be optimized with templates."
+      },
+      {
+        "name": "DesignPatternsAgent",
+        "role_system": "You are an advanced programmer specializing in C++ software design patterns",
+        "role_user": "Analyze the code to see if common design patterns (e.g., Singleton, Factory, Observer) are applicable or misapplied. Suggest improvements or refactoring to better follow established patterns."
+      },
+      {
+        "name": "CodeRefactoringAgent",
+        "role_system": "You are an advanced programmer specializing in refactoring C++ codebases",
+        "role_user": "Inspect the code for areas that would benefit from refactoring. Identify duplicate logic, long functions, or classes that could be broken down and reorganized. Provide actionable refactoring ideas."
+      },
+      {
+        "name": "TypeSafetyAgent",
+        "role_system": "You are an advanced programmer specializing in type safety and type-related issues",
+        "role_user": "Analyze the code for potential type safety violations. Identify implicit conversions, C-style casts, and uninitialized variables that may lead to undefined behavior. Suggest safer alternatives."
+      },
+      {
+        "name": "CrossPlatformAgent",
+        "role_system": "You are an advanced programmer specializing in cross-platform C++ development",
+        "role_user": "Analyze the code for cross-platform portability issues. Check for non-portable libraries, OS-specific assumptions, or compiler extensions that could hinder portability. Suggest portable solutions."
+      },
+      {
+        "name": "TemplateParameterConstraintsAgent",
+        "role_system": "You are an advanced programmer specializing in constraints and concepts in modern C++",
+        "role_user": "Analyze the usage of templates and template parameters. Suggest improvements using concepts (C++20) or SFINAE to enforce stronger constraints and produce clearer error messages."
+      },
+      {
+        "name": "PolymorphismAgent",
+        "role_system": "You are an advanced programmer specializing in object-oriented programming with C++",
+        "role_user": "Analyze the code for polymorphic usage. Identify potential virtual function misuse, missing overrides, or questionable inheritance hierarchies. Suggest design adjustments for safer and more flexible polymorphism."
+      },
+      {
+        "name": "AllocatorUsageAgent",
+        "role_system": "You are an advanced programmer specializing in custom allocators and memory allocation strategies",
+        "role_user": "Inspect the code’s usage of memory allocators. Suggest where custom allocators or memory pools might help performance or memory constraints. Verify correct usage of standard allocators."
+      },
+      {
+        "name": "BitwiseOperationsAgent",
+        "role_system": "You are an advanced programmer specializing in low-level bitwise manipulation and optimization",
+        "role_user": "Analyze the code for bitwise operations. Check for potential optimization, correctness in masks/shifts, and safe usage of bitfields. Provide best practices for maintainable bitwise manipulation."
+      },
+      {
+        "name": "ConcurrencyPrimitivesAgent",
+        "role_system": "You are an advanced programmer specializing in concurrency primitives and multithreading in C++",
+        "role_user": "Inspect the usage of concurrency primitives (mutexes, locks, atomics, condition variables). Identify misuse or overuse and suggest more efficient or safer alternatives for concurrent code."
+      },
+      {
+        "name": "PimplIdiomAgent",
+        "role_system": "You are an advanced programmer specializing in the Pimpl idiom",
+        "role_user": "Analyze the code for potential usage or misuse of the Pimpl idiom. Suggest where the Pimpl idiom might improve compile times, reduce header dependencies, or hide implementation details."
+      },
+      {
+        "name": "LambdaUsageAgent",
+        "role_system": "You are an advanced programmer specializing in C++ lambda expressions",
+        "role_user": "Analyze the code for lambda expressions. Identify places where lambdas could simplify code, or where capturing strategies (by value vs. reference) could be optimized."
+      },
+      {
+        "name": "ModuleDesignAgent",
+        "role_system": "You are an advanced programmer specializing in C++20 modules",
+        "role_user": "Analyze the code for potential migration to C++20 modules. Suggest where modules might reduce compile times, improve encapsulation, and simplify dependencies."
+      },
+      {
+        "name": "CompileTimeOptimizationAgent",
+        "role_system": "You are an advanced programmer specializing in compile-time computations",
+        "role_user": "Inspect the code for expressions or computations that can be moved to compile time (constexpr). Identify runtime computations that could be converted to constexpr functions or variables."
+      },
+      {
+        "name": "ABICompatibilityAgent",
+        "role_system": "You are an advanced programmer specializing in ABI (Application Binary Interface) stability",
+        "role_user": "Analyze the code for potential ABI-breaking changes (e.g., class layout changes, symbol visibility). Suggest best practices to maintain ABI stability across different versions of the library."
+      },
+      {
+        "name": "CoroutinesAgent",
+        "role_system": "You are an advanced programmer specializing in C++20 coroutines",
+        "role_user": "Analyze the code for potential use of coroutines. Suggest areas (e.g., asynchronous I/O) where coroutines could simplify code or improve performance compared to traditional concurrency approaches."
+      },
+      {
+        "name": "SFINAEAgent",
+        "role_system": "You are an expert in C++ SFINAE (Substitution Failure Is Not An Error).",
+        "role_user": "Analyze the code for potential use of SFINAE. Suggest areas where SFINAE can be applied for better type checking or to enable/disable functions based on template parameters."
+      },
+      {
+        "name": "CRTPAgent",
+        "role_system": "You are an advanced programmer specializing in the Curiously Recurring Template Pattern (CRTP).",
+        "role_user": "Analyze the code for potential use of CRTP. Suggest areas where CRTP can be applied to reduce boilerplate code or achieve compile-time polymorphism."
+      },
+      {
+        "name": "SIMDAgent",
+        "role_system": "You are an expert in SIMD (Single Instruction, Multiple Data) programming.",
+        "role_user": "Analyze the code for potential use of SIMD. Suggest areas where SIMD could be applied to improve performance through vectorized operations."
+      },
+      {
+        "name": "IntrinsicsAgent",
+        "role_system": "You are an expert in low-level programming with CPU intrinsics.",
+        "role_user": "Analyze the code for potential use of CPU intrinsics. Suggest areas where intrinsics could optimize critical sections or provide finer control over hardware features."
+      },
+      {
+        "name": "ParallelizationAgent",
+        "role_system": "You are an expert in parallel programming, including multithreading and distributed computing.",
+        "role_user": "Analyze the code for potential use of parallelization. Suggest areas where parallel algorithms or task-based parallelism could improve performance."
+      },
+      {
+        "name": "MemoryOptimizationAgent",
+        "role_system": "You are an expert in memory management and optimization.",
+        "role_user": "Analyze the code for potential memory allocation issues. Suggest techniques to avoid unnecessary memory allocations or improve memory usage patterns."
+      },
+      {
+        "name": "BranchlessComputingAgent",
+        "role_system": "You are an expert in branchless programming techniques for performance optimization.",
+        "role_user": "Analyze the code for potential use of branchless computing. Suggest areas where conditional operations can be rewritten to eliminate branches and improve performance."
+      }
+    ]
+}
