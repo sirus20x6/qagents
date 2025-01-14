@@ -1,5 +1,5 @@
 {
-    "model": "/home/sirus/Downloads/Qwen2.5-Coder-7B-Instruct-Q4_K_L.gguf",
+    "model": "/thearray/git/ob/text-generation-webui/models/Qwen2.5-Coder-32B-Instruct-Q8_0.gguf",
     "batch_size": 4,
     "agents": [
       {

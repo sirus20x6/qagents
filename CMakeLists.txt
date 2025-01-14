@@ -27,6 +27,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cpr)
 
+# Add sanitizer support
+option(ENABLE_SANITIZER "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+if(ENABLE_SANITIZER)
+    message(STATUS "Sanitizers enabled.")
+    set(SANITIZER_FLAGS "-fsanitize=address,undefined -fno-omit-frame-pointer")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZER_FLAGS}")
+endif()
+
 # Add the executable
 add_executable(DynamicAgents 
     main.cpp

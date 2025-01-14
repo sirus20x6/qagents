@@ -47,48 +47,85 @@ public:
         const std::vector<Request>& requests, 
         const std::string& model, 
         int maxTokens) {
-        std::vector<nlohmann::json> responses;
-
+        
+        // Create the messages array with all requests combined
+        nlohmann::json messages = nlohmann::json::array();
+        
         for (const auto& req : requests) {
-            // Create the messages array first to ensure proper escaping
-            nlohmann::json messages = nlohmann::json::array({
-                {
-                    {"role", "system"},
-                    {"content", req.system_role}
-                },
-                {
-                    {"role", "user"},
-                    {"content", req.prompt}
-                }
+            // Add system message
+            messages.push_back({
+                {"role", "system"},
+                {"content", req.system_role}
             });
-
-            // Create the full request body
-            nlohmann::json requestBody = {
-                {"model", model},
-                {"messages", messages},
-                {"max_tokens", maxTokens},
-                {"temperature", 0.2}
-            };
-
-            // Convert to string with proper escaping
-            std::string jsonStr = requestBody.dump();
-            std::cout << "sending " << jsonStr << std::endl;
-
-            auto response = cpr::Post(
-                cpr::Url{baseUrl + "/v1/chat/completions"},
-                cpr::Header{{"Content-Type", "application/json"}},
-                cpr::Body(jsonStr),
-                cpr::Timeout{timeoutSeconds * 10000}
-            );
             
-            if (response.status_code != 200) {
-                throw std::runtime_error("Request failed with status " + 
-                    std::to_string(response.status_code) + ": " + response.text);
-            }
-
-            responses.push_back(nlohmann::json::parse(response.text));
+            // Add user message
+            messages.push_back({
+                {"role", "user"},
+                {"content", req.prompt}
+            });
         }
 
-        return responses;
+        // Create the request body as a single object
+        nlohmann::json requestBody = {
+            {"model", model},
+            {"messages", messages},
+            {"max_tokens", maxTokens},
+            {"temperature", 0.2},
+            {"stream", false}
+        };
+
+        // Convert to string with proper escaping
+        std::string jsonStr = requestBody.dump();
+        std::cout << "sending batch request with " << requests.size() << " prompts\n";
+
+        auto response = cpr::Post(
+            cpr::Url{baseUrl + "/v1/chat/completions"},
+            cpr::Header{{"Content-Type", "application/json"}},
+            cpr::Body(jsonStr),
+            cpr::Timeout{timeoutSeconds * 10000}
+        );
+        
+        if (response.status_code != 200) {
+            throw std::runtime_error("Request failed with status " + 
+                std::to_string(response.status_code) + ": " + response.text);
+        }
+
+        try {
+            // Parse the single response
+            nlohmann::json jsonResponse = nlohmann::json::parse(response.text);
+            std::vector<nlohmann::json> results;
+            results.reserve(requests.size());  // Pre-allocate space
+
+            // The content contains all responses in order
+            std::string responseContent = jsonResponse["choices"][0]["message"]["content"].get<std::string>();
+            
+            // Create a response object for each request
+            for (size_t i = 0; i < requests.size(); ++i) {
+                // Construct each response JSON object with proper ownership
+                nlohmann::json choices = nlohmann::json::array();
+                choices.push_back({
+                    {"message", {
+                        {"content", responseContent},
+                        {"role", "assistant"}
+                    }},
+                    {"index", 0}
+                });
+
+                nlohmann::json response({
+                    {"choices", choices}
+                });
+
+                results.push_back(std::move(response));
+            }
+            
+            return results;
+
+        } catch (const nlohmann::json::exception& e) {
+            std::cerr << "JSON parsing error: " << e.what() << std::endl;
+            throw;
+        } catch (const std::exception& e) {
+            std::cerr << "Error processing response: " << e.what() << std::endl;
+            throw;
+        }
     }
 };
