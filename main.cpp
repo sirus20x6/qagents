@@ -1,7 +1,14 @@
 #include "api_client.hpp"
+#include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <ctime>
+#include <future>   // for std::async, std::future
+#include <stdexcept>
 #include <limits.h>
 
 using json = nlohmann::json;
@@ -20,24 +27,66 @@ std::string readFile(const std::string& path) {
         throw std::runtime_error("Could not open file: " + path);
     }
     return std::string(std::istreambuf_iterator<char>(file),
-                      std::istreambuf_iterator<char>());
+                       std::istreambuf_iterator<char>());
+}
+
+std::string getCurrentDateTime() {
+    auto now = std::time(nullptr);
+    auto* dt = std::localtime(&now);
+    std::ostringstream oss;
+    oss << std::put_time(dt, "%Y-%m-%d %H:%M:%S");
+    return oss.str();
 }
 
 void writeReport(const std::string& fileName, 
-                const std::vector<std::string>& agentNames,
-                const std::vector<std::string>& responses) {
+                 const std::vector<std::string>& agentNames,
+                 const std::vector<std::string>& responses) 
+{
     std::string reportName = "analysis_report.txt";
     std::ofstream report(reportName, std::ios::app);
     if (!report.is_open()) {
         throw std::runtime_error("Could not open report file: " + reportName);
     }
 
-    report << "\nAnalysis Report for " << fileName << ":\n";
+    // Get current date and time
+    std::string datetime = getCurrentDateTime();
+
+    // Write report header
+    report << "\n" << std::string(80, '=') << "\n";
+    report << "C++ CODE ANALYSIS REPORT\n";
+    report << "Generated: " << datetime << "\n";
+    report << "File Analyzed: " << fileName << "\n";
+    report << std::string(80, '=') << "\n\n";
+
+    // Write each agent's analysis
     for (size_t i = 0; i < agentNames.size(); ++i) {
-        report << "\n" << agentNames[i] << " Report:\n";
-        report << responses[i] << "\n";
+        // Section header
+        report << "REPORT #" << std::setfill('0') << std::setw(2) << (i + 1) << ": " 
+               << agentNames[i] << "\n";
+        report << std::string(50, '-') << "\n";
+        
+        // Indent the response content
+        std::string response = responses[i];
+        std::istringstream iss(response);
+        std::string line, indented;
+        while (std::getline(iss, line)) {
+            if (!line.empty()) {
+                indented += "    " + line + "\n";
+            } else {
+                indented += "\n";
+            }
+        }
+        
+        report << indented << "\n";
+        
+        // Separator after each agent's report
+        report << std::string(80, '-') << "\n\n";
     }
-    report << "\n----------------------------------------\n";
+
+    // Report footer
+    report << std::string(80, '=') << "\n";
+    report << "END OF ANALYSIS REPORT\n";
+    report << std::string(80, '=') << "\n\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -49,10 +98,10 @@ int main(int argc, char* argv[]) {
 
         std::string filePath = argv[1];
         
-        // Load agent configuration
+        // Load agent configuration (agents.json must contain model + agents array)
         json config = loadConfig("agents.json");
         
-        // Get model and batching configuration
+        // Get model path or name, make absolute if needed
         std::string model = config["model"].get<std::string>();
         if (model[0] != '/') {
             char absPath[PATH_MAX];
@@ -62,9 +111,7 @@ int main(int argc, char* argv[]) {
                 throw std::runtime_error("Could not resolve absolute path for model: " + model);
             }
         }
-        
-        int batchSize = config["batch_size"].get<int>();
-        
+
         // Initialize API client and test connection
         LlamaApiClient client("http://localhost:8080");
         try {
@@ -83,52 +130,60 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        // Process in batches
-        std::vector<std::string> responses;
+        // Collect all agents from config
         std::vector<std::string> agentNames;
-
-        // Collect all agents first
-        std::vector<LlamaApiClient::Request> allRequests;
+        std::vector<LlamaApiClient::Request> requests;
         for (const auto& agent : config["agents"]) {
             std::string name = agent["name"].get<std::string>();
             std::string system_role = agent["role_system"].get<std::string>();
             std::string user_role = agent["role_user"].get<std::string>();
-            
+
             agentNames.push_back(name);
-            allRequests.push_back({
+            requests.push_back({
                 name,
                 system_role,
+                // The user prompt includes code + any agent-specific user instructions
                 user_role + "\n\nCode to analyze:\n" + code
             });
         }
 
-        // Process in batches
-        for (size_t i = 0; i < allRequests.size(); i += batchSize) {
-            std::cout << "Processing batch starting with " << allRequests[i].name << "...\n";
-            
-            // Prepare batch
-            std::vector<LlamaApiClient::Request> batchRequests;
-            for (size_t j = 0; j < batchSize && i + j < allRequests.size(); ++j) {
-                batchRequests.push_back(allRequests[i + j]);
-            }
+        // We'll store each agent's response here, in order
+        std::vector<std::string> responses(requests.size());
 
-            try {
-                auto batchResponses = client.createBatchCompletions(batchRequests, model, 1024);
-                for (const auto& response : batchResponses) {
-                    responses.push_back(response["choices"][0]["message"]["content"].get<std::string>());
+        // Launch concurrent tasks for each agent
+        std::vector<std::future<void>> futures;
+        futures.reserve(requests.size());
+
+        for (size_t i = 0; i < requests.size(); ++i) {
+            auto req = requests[i];
+            // Launch async job to createSingleCompletion
+            futures.push_back(std::async(std::launch::async, [&, i, req, model]() {
+                try {
+                    // Each agent: single, isolated conversation
+                    auto jsonResponse = client.createSingleCompletion(req, model, 1024);
+
+                    // Extract the assistant's message
+                    if (jsonResponse.contains("choices") && 
+                        !jsonResponse["choices"].empty()) 
+                    {
+                        responses[i] = jsonResponse["choices"][0]["message"]["content"].get<std::string>();
+                    } else {
+                        responses[i] = "Error: No 'choices' returned or empty response";
+                    }
+                } catch (const std::exception& e) {
+                    responses[i] = std::string("Error: ") + e.what();
                 }
-                std::cout << "Completed batch.\n";
-            } catch (const std::exception& e) {
-                std::cerr << "Error processing batch: " << e.what() << "\n";
-                for (size_t j = 0; j < batchRequests.size(); ++j) {
-                    responses.push_back("Error: Analysis failed");
-                }
-            }
+            }));
         }
 
-        // Write analysis results
+        // Wait for all async tasks to finish
+        for (auto& f : futures) {
+            f.get();  // rethrow exceptions if any
+        }
+
+        // Now we have all the agent responses; write them to the report
         writeReport(filePath, agentNames, responses);
-        
+
         std::cout << "Analysis complete for " << filePath << "\n";
         return 0;
 

@@ -36,7 +36,8 @@ if(ENABLE_SANITIZER)
 endif()
 
 # Add the executable
-add_executable(DynamicAgents 
+add_executable(DynamicAgents
+    api_client.cpp
     main.cpp
 )
 
