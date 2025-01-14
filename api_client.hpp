@@ -91,37 +91,39 @@ public:
         }
 
         try {
-            // Parse the single response
+            // Parse the response
             nlohmann::json jsonResponse = nlohmann::json::parse(response.text);
-            std::vector<nlohmann::json> results;
-            results.reserve(requests.size());  // Pre-allocate space
-
-            // The content contains all responses in order
-            std::string responseContent = jsonResponse["choices"][0]["message"]["content"].get<std::string>();
             
-            // Create a response object for each request
+            // Get the combined content from the single response
+            std::string combinedContent = jsonResponse["choices"][0]["message"]["content"].get<std::string>();
+            
+            // Create individual responses for each request using the same content
+            std::vector<nlohmann::json> results;
+            results.reserve(requests.size());
+
             for (size_t i = 0; i < requests.size(); ++i) {
-                // Construct each response JSON object with proper ownership
+                nlohmann::json singleResponse;
                 nlohmann::json choices = nlohmann::json::array();
+                
                 choices.push_back({
                     {"message", {
-                        {"content", responseContent},
+                        {"content", combinedContent},
                         {"role", "assistant"}
                     }},
-                    {"index", 0}
+                    {"index", i}
                 });
-
-                nlohmann::json response({
-                    {"choices", choices}
-                });
-
-                results.push_back(std::move(response));
+                
+                singleResponse["choices"] = std::move(choices);
+                results.push_back(std::move(singleResponse));
             }
-            
+
+            std::cout << "Successfully processed batch response\n";
             return results;
 
         } catch (const nlohmann::json::exception& e) {
             std::cerr << "JSON parsing error: " << e.what() << std::endl;
+            // Print the raw response for debugging
+            std::cerr << "Raw response: " << response.text.substr(0, 1000) << "...\n";
             throw;
         } catch (const std::exception& e) {
             std::cerr << "Error processing response: " << e.what() << std::endl;
