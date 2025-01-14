@@ -48,11 +48,6 @@
         "role_user": "Identify potential performance bottlenecks and suggest optimizations (e.g., unnecessary copying, inefficient algorithms, suboptimal data structures). Provide rationale for each optimization."
       },
       {
-        "name": "SecurityVulnerabilitiesAgent",
-        "role_system": "You are an advanced programmer specializing in C++ security",
-        "role_user": "Analyze the code for potential security vulnerabilities such as buffer overflows, use-after-free, or unvalidated input. Provide steps to mitigate these risks."
-      },
-      {
         "name": "APIDesignAgent",
         "role_system": "You are an advanced programmer specializing in API design",
         "role_user": "Analyze the API design for usability, consistency, and proper encapsulation. Consider interface design principles and provide recommendations for a more intuitive API."
@@ -66,6 +61,11 @@
         "name": "TestabilityAgent",
         "role_system": "You are an advanced programmer specializing in software testing",
         "role_user": "Analyze code testability. Identify areas that might be difficult to test and suggest improvements or design changes for better test coverage and simpler testing."
+      },
+      {
+        "name": "MemorySafetyAgent",
+        "role_system": "You are an expert in identifying and preventing buffer underflows, overflows, and memory corruption issues in C++.",
+        "role_user": "Analyze the code for potential buffer underflows, overflows, or memory corruption. Suggest techniques to prevent such issues, such as bounds checking, safer memory handling practices, or using standard library features like `std::vector` or `std::array` to replace raw pointers and C-style arrays."
       },
       {
         "name": "DependencyManagementAgent",
